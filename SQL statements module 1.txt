@@ -1,0 +1,19 @@
+SELECT *
+FROM SalesLT.Product;
+
+SELECT CAST(ProductID AS varchar(5)) + ': ' + Name AS ProductName
+FROM SalesLT.Product;
+
+SELECT CONVERT(varchar(5), ProductID) +': ' + Name AS ProductName
+FROM SalesLT.Product;
+
+SELECT SellStartDate,
+       CONVERT(nvarchar(30), SellStartDate) AS ConvertedDate,
+       CONVERT(nvarchar(30), SellStartDate, 126) AS ISO8601FormatDat
+FROM SalesLT.Product; 
+
+-- TRY CAST geeft geen foutmelding als hij geen "goede text" kan vinden om naar een integer te converteren, maar geeft dan NULL.
+           
+SELECT Name,
+       TRY_CAST(Size AS INT) AS NumericSize
+FROM SalesLT.Product;
