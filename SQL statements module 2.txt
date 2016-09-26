@@ -1,0 +1,19 @@
+--Selecteerd alleen unieke rijen (combinaties)
+SELECT DISTINCT Color, Size
+FROM SalesLT.Product;
+
+-- Let op! sorteerd dus eerst op Category ASC! en daarna pas op ListPrice desc
+SELECT ProductCategoryID AS Category, Name
+FROM SalesLT.Product
+ORDER BY Category, ListPrice DESC;
+
+SELECT TOP 10 ListPrice, Name
+FROM SalesLT.Product
+ORDER BY ListPrice DESC;
+
+-- Selecteer de rijen 11 tm 15 (vanaf de hoogste prijs)
+SELECT ListPrice, Name
+FROM SalesLT.Product
+ORDER BY ListPrice DESC
+OFFSET 10 ROWS
+FETCH NEXT 5 ROWS ONLY;
