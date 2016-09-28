@@ -1,0 +1,61 @@
+--Selecteerd alleen unieke rijen (combinaties)
+SELECT DISTINCT Color, Size
+FROM SalesLT.Product;
+
+-- Let op! sorteerd dus eerst op Category ASC! en daarna pas op ListPrice desc
+SELECT ProductCategoryID AS Category, Name
+FROM SalesLT.Product
+ORDER BY Category, ListPrice DESC;
+
+SELECT TOP 10 ListPrice, Name
+FROM SalesLT.Product
+ORDER BY ListPrice DESC;
+
+-- Selecteer de rijen 11 tm 15 (vanaf de hoogste prijs)
+SELECT ListPrice, Name
+FROM SalesLT.Product
+ORDER BY ListPrice DESC
+OFFSET 10 ROWS
+FETCH NEXT 5 ROWS ONLY;
+
+--Selecteer info over product model 6 (<,>,<=,>=,<> kunnen ook allemaal)
+SELECT Name, Color, Size, ProductModelID, ProductNumber
+FROM SalesLT.Product
+WHERE ProductModelID = 6;
+
+--Idem product model begind met FR (%58, %R%, etc kunnen ook allemaal)
+SELECT Name, Color, Size, ProductModelID, ProductNumber
+FROM SalesLT.Product
+WHERE ProductNumber LIKE 'FR%';
+
+-- Underscore_betekend elk nummer of elk karakter maar specefiek op die plaats! 
+-- Begind met FR_, dan iets, dan 2 getallen, dan iets, dan-, dan 2 getallen 
+SELECT Name, Color, Size, ProductModelID, ProductNumber
+FROM SalesLT.Product
+WHERE ProductNumber LIKE 'FR-_[0-9][0-9]_-[0-9][0-9]';
+
+-- Producten die geen SellEndDate hebben
+SELECT Name, Color, Size, ProductModelID, ProductNumber, SellEndDate
+FROM SalesLT.Product
+WHERE SellEndDate IS NOT NULL;
+
+--Producten die een SellEndDate hebben in 2003
+SELECT Name, Color, Size, ProductModelID, ProductNumber, SellEndDate
+FROM SalesLT.Product
+WHERE SellEndDate BETWEEN '2003/1/1' AND '2003/12/31';
+
+--Producten met ID 5. 6 of 7
+SELECT Name, Color, Size, ProductModelID, ProductNumber, SellEndDate
+FROM SalesLT.Product
+WHERE ProductModelID IN (5,6,7);
+
+--Producten met ID 5. 6 of 7 EN die geen SellEndDate hebben
+SELECT Name, Color, Size, ProductModelID, ProductNumber, SellEndDate
+FROM SalesLT.Product
+WHERE ProductModelID IN (5,6,7) AND SellEndDate is NULL;
+
+--Producten met ID 5. 6 of 7 OF met Name die begind met FR
+SELECT Name, Color, Size, ProductModelID, ProductNumber, SellEndDate
+FROM SalesLT.Product
+WHERE ProductModelID IN (5,6,7) OR Name LIKE 'FR%';
+
