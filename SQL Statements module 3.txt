@@ -1,0 +1,82 @@
+--INNER JOINS:
+--Return ONLY rows where a mach is found in both input tables
+--Match rows based on attributes supplied in predicate
+--If join predicator is =, also known as equi-join
+
+--Basic inner join:
+Select SalesLT.Product.Name as ProductName, SalesLT.ProductCategory.Name as Category
+From SalesLT.Product inner join SalesLT.ProductCategory
+on SalesLT.Product.ProductCategoryID = SalesLT.ProductCategory.ProductCategoryID;
+
+--Table aliases:
+Select p.Name as ProductName, c.Name as CategoryName
+From SalesLT.Product as p inner join SalesLT.ProductCategory as c
+on p.ProductCategoryID = c.ProductCategoryID;
+
+--Joining more than two tables:
+Select oh.OrderDate, oh.SalesOrderNumber, p.Name as ProductName, od.OrderQty, od.UnitPrice, od.LineTotal
+From SalesLT.SalesOrderHeader as oh join SalesLT.SalesOrderDetail as od
+On oh.SalesOrderID = od.SalesOrderID
+Join SalesLT.Product as p
+On od.ProductID = p.ProductID
+Order by oh.OrderDate, oh.SalesOrderID, od.SalesOrderDetailID;	
+
+--Multiple join predicates:
+Select oh.OrderDate, oh.SalesOrderNumber, p.Name as ProductName, od.OrderQty, od.UnitPrice, od.LineTotal
+From SalesLT.SalesOrderHeader as oh join SalesLT.SalesOrderDetail as od
+On oh.SalesOrderID = od.SalesOrderID
+Join SalesLT.Product as p
+On od.ProductID = p.ProductID AND od.UnitPrice < p.ListPrice --Note multiple predicates
+Order by oh.OrderDate, oh.SalesOrderID, od.SalesOrderDetailID;	
+
+--OUTER JOINS:
+--Return all rows from one table and ANY matching rows from the second table
+--One table rows are "presurved"
+--Designated with LEFT(keep all the rows from the first table), RIght(keep all from the second) and FULL(keep all from both tables) keyword
+--All rows from preserved table output to result set
+
+--Get all customers and for those who bought something include the sales:
+Select c.FirstName, c.LastName, oh.SalesOrderNumber
+From SalesLT.Customer as c left outer join SalesLT.SalesOrderHeader as oh
+on c.CustomerID = oh.CustomerID
+order by c.CustomerID; --NULL is returned as a customer has  not bought anything!
+
+--Return only customers who haven'd bought anything:
+Select c.FirstName, c.LastName, oh.SalesOrderNumber
+From SalesLT.Customer as c left outer join SalesLT.SalesOrderHeader as oh
+on c.CustomerID = oh.CustomerID
+where oh.SalesOrderNumber IS NULL
+order by c.CustomerID;
+
+--More than two tables:
+Select p.Name as ProductName, oh.SalesOrderNumber
+from SalesLT.Product as p left join SalesLT.SalesOrderDetail as od
+on p.ProductID = od.ProductID
+left join SalesLT.SalesOrderHeader as oh --Additional tables added to the right must also use a left join
+on od.SalesOrderID = oh.SalesOrderID
+Order by p.ProductID;
+
+Select p.Name as ProductName, c.Name as Category, oh.SalesOrderNumber
+From SalesLT.Product as p left join SalesLT.SalesOrderDetail as od
+on p.ProductID = od.ProductID
+left join SalesLT.SalesOrderHeader as oh --Additional tables added to the right must also use a left join
+on od.SalesOrderID = oh.SalesOrderID
+INNER join SalesLT.ProductCategory as c --Added to the LEFT so we can use the INNER join
+on p.ProductCategoryID = c.ProductCategoryID
+order by p.ProductID;
+
+--CROSS JOINS (there is NO on clause because cross joins DON'T filter !):	
+--Combine each row from the first table with each row from the second table
+--All possible combinations output
+--Logical foundation for inner and outer joins
+--  -Inner join starts with Cartesian product, adds filter
+--  -Outer join takes Cartesian output, filtered, adds back non maching rows ( with NULL placeholders )
+
+--Call each customer once per product:
+Select p.Name, c.FirstName, c.LastName, c.Phone
+From SalesLT.Product as p cross join SalesLT.Customer as c;
+
+--SELF JOINS:
+-- Compare rows in the same table to each other
+-- Create two instances of the same table in the from clause ( at least one alias required )
+-- Example: return all emloyees and the name of the emloyees manager ( a manager is also a employee )
