@@ -1,0 +1,37 @@
+--UNION returns a result set of DISTINCT ROWS combined from all statements
+--UNION removes duplicates during the query ( affects performance )
+--UNION ALL retaines duplicates during query processing
+
+--UNION Guidelines
+--Column aliasses must be expressed in the FIRST query
+--Number of columns MUST be the same
+--Dta types must be compatible for implicit conversion (or converted explicitly)
+
+
+select FirstName, LastName,'Customer'as type -- een literal om onderscheid te maken ..
+from SalesLT.Customer
+union
+select FirstName, LastNam,'Employee'
+from SalesLT.Emloyee --Er is nog geen Employee tabel in AdventureWorks
+order by LastName
+
+--INTERSECT returns only distinct rows that appear in BOTH result sets
+--EXCEPT returns only distinct rows that appear in the first set but not the second (Order in wich sets are specified matters)
+--  Only shows customers who are NOT employees as well
+
+select FirstName, LastName,'Customer'as type -- een literal om onderscheid te maken ..
+from SalesLT.Customer
+intersect
+select FirstName, LastNam,'Employee'
+from SalesLT.Emloyee --Er is nog geen Employee tabel in AdventureWorks
+order by LastName
+--SHOWS ONLY THE DUPLICATE RECORD (the difference in records bu union and union all)
+
+select FirstName, LastName,'Customer'as type -- een literal om onderscheid te maken ..
+from SalesLT.Customer
+except
+select FirstName, LastNam,'Employee'
+from SalesLT.Emloyee --Er is nog geen Employee tabel in AdventureWorks
+order by LastName
+--Shows the customers but leave out the customers who also are employee (Order in wich sets are specified matters)
+
