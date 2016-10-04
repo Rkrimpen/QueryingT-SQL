@@ -1,0 +1,78 @@
+--Scalar functions
+select YEAR(SellStartDate) as SellStartYear,DATENAME(mm,SellStartDate) as SellStartMonth,
+       DATENAME(dw,SellStartDate) as SellStartWeekday,
+	   ProductID, Name
+from SalesLT.Product
+order by SellStartYear;
+
+select DATEDIFF(yy,SellStartDate,GETDATE()) as YearsSold, ProductID, Name
+from SalesLT.Product
+order by ProductID;
+
+select UPPER(Name) as ProductName
+from SalesLT.Product;
+
+select CONCAT(FirstName + ' ',LastName) as FullName
+from SalesLT.Customer;
+
+select Name, ProductNumber, LEFT(ProductNumber,2) as ProductType
+from SalesLT.Product;
+
+select Name, ProductNumber, LEFT(ProductNumber,2) as ProductType,
+       SUBSTRING(ProductNumber,CHARINDEX('-',ProductNumber,+1),5) as ModelCode,
+	   SUBSTRING(ProductNumber,LEN(ProductNumber) - CHARINDEX('-',REVERSE(RIGHT(ProductNumber,3)))+2,2) as Size
+from SalesLT.Product;
+
+--Logical functions
+select Name, Size as NumSize
+from SalesLT.Product
+where ISNUMERIC(Size)=1;-- 1 betekend true ( 0 = false )
+
+select Name, IIF(ProductCategoryID IN(5,6,7),'Bike','Other') as ProductType
+from SalesLT.Product;
+
+select Name, IIF(ISNUMERIC(Size)=1,'Numeric','Non-numeric') as ProductType
+from SalesLT.Product;
+
+select prd.Name as ProductName, cat.Name as CategoryName,
+CHOOSE(cat.ParentProductCategoryID, 'Bikes','Components', 'Clothing', 'Assessories') as ProductType
+from SalesLT.Product as prd
+join SalesLT.ProductCategory as cat
+on prd.ProductCategoryID = cat.ProductCategoryID;
+
+--Window functions
+
+select top(100) ProductID, Name, ListPrice,
+       RANK() OVER(order by ListPrice desc) as RankByPrice
+from SalesLT.Product
+order by RankByPrice;
+
+select c.Name as Category, p.Name as Product, ListPrice,
+     RANK() OVER(PARTITION by c.Name ORDER by ListPrice DESC) as RankPrice
+from SalesLT.Product as p join SalesLT.ProductCategory as c on p.ProductCategoryID = c.ProductCategoryID
+order by Category, RankPrice;
+
+--Aggregate functions
+
+select COUNT(*) as Products, COUNT(DISTINCT ProductCategoryID) as Categories, AVG(ListPrice) as AverigePrice
+from SalesLT.Product;
+
+select COUNT(p.ProductID) as Bikemodels, AVG(p.ListPrice) as AverigePrice
+from SalesLT.Product as p join SalesLT.ProductCategory as c on p.ProductCategoryID = c.ProductCategoryID
+where c.Name LIKE '%Bikes';
+
+select c.SalesPerson, ISNULL(SUM(oh.SubTotal), 0.00) as SalesRev
+from SalesLT.Customer as c left join SalesLT.SalesOrderHeader as oh on c.CustomerID = oh.CustomerID
+group by c.SalesPerson
+order by SalesRev desc;
+
+select c.SalesPerson,CONCAT(c.FirstName+' ',c.LastName) as Customer, ISNULL(SUM(oh.SubTotal), 0.00) as SalesRev
+from SalesLT.Customer as c left join SalesLT.SalesOrderHeader as oh on c.CustomerID = oh.CustomerID
+group by c.SalesPerson, CONCAT(c.FirstName+' ',c.LastName)
+order by SalesRev desc, Customer;
+
+select ProductID, SUM(sod.OrderQty) as Quantity, soh.OrderDate
+from SalesLT.SalesOrderDetail as sod join SalesLT.SalesOrderHeader as soh on sod.SalesOrderID = soh.SalesOrderID
+where YEAR(soh.OrderDate)=2004
+group by ProductID, soh.OrderDate
+HAVING SUM(sod.OrderQty)>50;
